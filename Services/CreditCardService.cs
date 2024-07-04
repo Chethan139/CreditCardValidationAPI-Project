@@ -2,7 +2,7 @@
 {
     public class CreditCardService
     {
-        public bool ValidateLuhn(string cardNumber)
+        public virtual bool ValidateLuhn(string cardNumber)  // Make this method virtual
         {
             if (string.IsNullOrEmpty(cardNumber))
             {
@@ -13,6 +13,11 @@
             bool alternate = false;
             for (int i = cardNumber.Length - 1; i >= 0; i--)
             {
+                if (!char.IsDigit(cardNumber[i]))
+                {
+                    throw new ArgumentException("Card number must contain only digits.");
+                }
+
                 int n = int.Parse(cardNumber[i].ToString());
                 if (alternate)
                 {

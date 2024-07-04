@@ -1,11 +1,12 @@
 ﻿using CreditCardValidationAPI.Models;
 using CreditCardValidationAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CreditCardValidationAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class CreditCardController : ControllerBase
     {
         private readonly CreditCardService _creditCardService;
@@ -16,17 +17,19 @@ namespace CreditCardValidationAPI.Controllers
         }
 
         [HttpPost("validate")]
-        public IActionResult ValidateCreditCard([FromBody] CreditCard creditCard)
+        public IActionResult ValidateCreditCard(CreditCard creditCard)
         {
-            if (creditCard == null || string.IsNullOrWhiteSpace(creditCard.CardNumber))
-            {
-                return BadRequest("Credit card number is required.");
-            }
-
             try
             {
+                if (string.IsNullOrEmpty(creditCard.CardNumber))
+                {
+                    return BadRequest("Credit card number is required.");
+                }
+
                 var isValid = _creditCardService.ValidateLuhn(creditCard.CardNumber);
-                return Ok(new { isValid });
+                var result = new CreditCardValidationResult { IsValid = isValid };
+
+                return Ok(result);
             }
             catch (ArgumentException ex)
             {
